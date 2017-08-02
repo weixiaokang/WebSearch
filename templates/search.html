@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>简书文章搜索</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap-theme.min.css" %}">
+</head>
+<body>
+<div id="container">
+    <div id="header" style="text-align: center">
+        <h1 style="margin-bottom: 2%">简书文章搜索</h1>
+        <form class="form-inline" name="search" action="/search_keyword/" method="POST">
+            {% csrf_token %}
+            <p>
+                {% if key %}
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="key_word" value="{{ key }}">
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="key_word" placeholder="搜索内容">
+                    </div>
+                {% endif %}
+            <button class="btn btn-primary" type="submit">搜索</button>
+            </p>
+        </form>
+    </div>
+    <hr/>
+    {% block high_search %}
+    {% endblock %}
+    {% if show %}
+        {% for doc in docs %}
+            <div id="doc" style="margin-left: 10%; margin-right: 10%">
+                <ul id="navigation">
+                    <p style="font-size: 18px"><a href="{{ doc.url }}" target="_blank">{{ doc.title }}</a></p>
+                    <p>{{ doc.time }}&nbsp;&nbsp;&nbsp;&nbsp;相关度：{{ doc.score }}<br/>{{ doc.snippet }}<br/></p>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            推荐阅读
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            {% for article in doc.recommend %}
+                                <li><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </ul>
+            </div>
+            <br/>
+        {% endfor %}
+        {% block next %}
+            <ul>
+                {% for i in page %}
+                    <a href="/search/page/{{ i }}/">{{ i }}</a>&nbsp;
+                {% endfor %}
+            </ul>
+        {% endblock %}
+    {% else %}
+        <p style="margin-left: 10%; margin-right: 10%; font-size: 18px">很抱歉，没有找到和{{ key }}相关的网页！</p>
+    {% endif %}
+</div>
+<script src="{% static "jquery/jquery-2.2.3.min.js" %}"></script>
+<script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+</body>
+</html>
